@@ -1,14 +1,12 @@
 const crisisTypes = ["SITES P1", "SITES P2/P3"];
-
 const timersP1 = [
     { duration: 5, message: "NATIS N2 / NATIS NOC" },
     { duration: 10, message: "Net N2 y N3, NATS N2 / PLs (Net e NATIS) / IS Ops Analista" },
     { duration: 30, message: "Network TLS / IS OPS Leaders" },
     { duration: 40, message: "Managers Infra / Sustentación e NATIS Manager" }
 ];
-
 const timersP2P3 = [
-    { duration: 5, message: "NATIS N2 / NATIS NOC" },
+    { duration: 5, message: "NATIS N2 \\ NATIS NOC" },
     { duration: 10, message: "Net N1, NATS N2 / NATIS PLS / IS Ops Analistas" },
     { duration: 25, message: "Network N2" },
     { duration: 40, message: "Network N3 / Net PLs / IS OPS Leaders" },
@@ -16,72 +14,20 @@ const timersP2P3 = [
     { duration: 70, message: "Managers e Infra / Sustentación" }
 ];
 
-function addStyles() {
-    const style = document.createElement('link');
-    style.rel = 'stylesheet';
-    style.href = chrome.runtime.getURL('content.css');
-    document.head.appendChild(style);
-}
-
-function showTimerOptionsPopup(timers) {
-    const popup = document.createElement('div');
-    popup.id = 'timer-popup';
-
-    popup.style.position = 'fixed';
-    popup.style.top = '10px';
-    popup.style.right = '10px';
-    popup.style.padding = '20px';
-    popup.style.backgroundColor = 'white';
-    popup.style.border = '1px solid #ccc';
-    popup.style.zIndex = '1000';
-    popup.style.width = '300px';
-
-    const title = document.createElement('h3');
-    title.textContent = 'Lista de Temporizadores e Equipes';
-    popup.appendChild(title);
-
-    const list = document.createElement('ul');
-    timers.forEach((timer, index) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${timer.duration} segundos - ${timer.message}`;
-        list.appendChild(listItem);
-    });
-    popup.appendChild(list);
-
-    const startButton = document.createElement('button');
-    startButton.textContent = 'Iniciar';
-    startButton.style.marginTop = '10px';
-    popup.appendChild(startButton);
-
-    document.body.appendChild(popup);
-
-    startButton.addEventListener('click', () => {
-        document.body.removeChild(popup);
-        startTimers(timers, 0);
-    });
-}
-
 function createInitialPopup() {
-    addStyles();
-
     const popup = document.createElement('div');
     popup.id = 'initial-popup';
-
     popup.style.position = 'fixed';
-    popup.style.top = '10px';
-    popup.style.right = '10px';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
     popup.style.padding = '20px';
-    popup.style.backgroundColor = 'white';
-    popup.style.border = '1px solid #ccc';
+    popup.style.backgroundColor = '#fff';
+    popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
     popup.style.zIndex = '1000';
-    popup.style.width = '300px';
-
-    const title = document.createElement('h3');
-    title.textContent = 'Iniciar Temporizador';
-    popup.appendChild(title);
 
     const question = document.createElement('p');
-    question.textContent = 'Essa reunião será usada para um incidente Critico?';
+    question.textContent = 'Essa reunião será usada para um incidente Crítico?';
     popup.appendChild(question);
 
     const yesButton = document.createElement('button');
@@ -101,67 +47,108 @@ function createInitialPopup() {
 
     yesButton.addEventListener('click', () => {
         document.body.removeChild(popup);
+        createCrisisTypePopup();
+    });
+}
 
-        const crisisSelectBox = document.createElement('select');
-        crisisTypes.forEach(crisis => {
-            const optionElement = document.createElement('option');
-            optionElement.text = crisis;
-            crisisSelectBox.add(optionElement);
-        });
+function createCrisisTypePopup() {
+    const popup = document.createElement('div');
+    popup.id = 'crisis-popup';
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.padding = '20px';
+    popup.style.backgroundColor = '#fff';
+    popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    popup.style.zIndex = '1000';
 
-        const crisisPopup = document.createElement('div');
-        crisisPopup.id = 'crisis-popup';
+    const question = document.createElement('p');
+    question.textContent = 'Escolha o Tipo de Crise';
+    popup.appendChild(question);
 
-        crisisPopup.style.position = 'fixed';
-        crisisPopup.style.top = '10px';
-        crisisPopup.style.right = '10px';
-        crisisPopup.style.padding = '20px';
-        crisisPopup.style.backgroundColor = 'white';
-        crisisPopup.style.border = '1px solid #ccc';
-        crisisPopup.style.zIndex = '1000';
-        crisisPopup.style.width = '300px';
+    const select = document.createElement('select');
+    crisisTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        select.appendChild(option);
+    });
+    popup.appendChild(select);
 
-        const crisisTitle = document.createElement('h3');
-        crisisTitle.textContent = 'Escolha o Tipo de Crise';
-        crisisPopup.appendChild(crisisTitle);
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = 'Confirmar';
+    confirmButton.style.marginTop = '10px';
+    popup.appendChild(confirmButton);
 
-        crisisPopup.appendChild(crisisSelectBox);
+    document.body.appendChild(popup);
 
-        const confirmButton = document.createElement('button');
-        confirmButton.textContent = 'Confirmar';
-        confirmButton.style.marginTop = '10px';
-        crisisPopup.appendChild(confirmButton);
+    confirmButton.addEventListener('click', () => {
+        const selectedCrisis = select.value;
+        document.body.removeChild(popup);
+        if (selectedCrisis === 'SITES P1') {
+            showTimerOptionsPopup(timersP1);
+        } else if (selectedCrisis === 'SITES P2/P3') {
+            showTimerOptionsPopup(timersP2P3);
+        }
+    });
+}
 
-        document.body.appendChild(crisisPopup);
+function showTimerOptionsPopup(timers) {
+    const popup = document.createElement('div');
+    popup.id = 'timer-popup';
+    popup.style.position = 'fixed';
+    popup.style.top = '55%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.padding = '20px';
+    popup.style.backgroundColor = '#fff';
+    popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    popup.style.zIndex = '1000';
 
-        confirmButton.addEventListener('click', () => {
-            const selectedCrisis = crisisSelectBox.value;
-            document.body.removeChild(crisisPopup);
+    const title = document.createElement('h3');
+    title.textContent = 'Lista de Temporizadores e Equipes';
+    popup.appendChild(title);
 
-            if (selectedCrisis === 'SITES P1') {
-                showTimerOptionsPopup(timersP1);
-            } else if (selectedCrisis === 'SITES P2/P3') {
-                showTimerOptionsPopup(timersP2P3);
-            }
-        });
+    const list = document.createElement('ul');
+    timers.forEach(timer => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${timer.duration} segundos - ${timer.message}`;
+        list.appendChild(listItem);
+    });
+    popup.appendChild(list);
+
+    const startButton = document.createElement('button');
+    startButton.textContent = 'Iniciar';
+    startButton.style.marginTop = '10px';
+    popup.appendChild(startButton);
+
+    document.body.appendChild(popup);
+
+    startButton.addEventListener('click', () => {
+        document.body.removeChild(popup);
+        startTimers(timers, 0);
     });
 }
 
 function showTimerEndedNotification(currentIndex, timers) {
     const notificationPopup = document.createElement('div');
     notificationPopup.id = 'notification-popup';
-
     notificationPopup.style.position = 'fixed';
-    notificationPopup.style.top = '10px';
-    notificationPopup.style.right = '10px';
+    notificationPopup.style.top = '50%';
+    notificationPopup.style.left = '50%';
+    notificationPopup.style.transform = 'translate(-50%, -50%)';
     notificationPopup.style.padding = '20px';
-    notificationPopup.style.backgroundColor = 'white';
-    notificationPopup.style.border = '1px solid #ccc';
-    notificationPopup.style.zIndex = '1001';
-    notificationPopup.style.width = '300px';
+    notificationPopup.style.backgroundColor = '#fff';
+    notificationPopup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    notificationPopup.style.zIndex = '1000';
+
+    const notificationTitle = document.createElement('h3');
+    notificationTitle.textContent = `${currentIndex + 1}º Temporizador Acabou`;
+    notificationPopup.appendChild(notificationTitle);
 
     const notificationContent = document.createElement('p');
-    notificationContent.textContent = `O tempo do temporizador ${currentIndex + 1} acabou! Acione a equipe: ${timers[currentIndex].message}.`;
+    notificationContent.textContent = `Acione a equipe: ${timers[currentIndex].message}.`;
     notificationPopup.appendChild(notificationContent);
 
     if (currentIndex < timers.length - 1) {
@@ -198,23 +185,20 @@ function showTimerEndedNotification(currentIndex, timers) {
         noButton.addEventListener('click', () => {
             document.body.removeChild(notificationPopup);
         });
-
-        document.body.appendChild(notificationPopup);
     } else {
         const endMessage = document.createElement('p');
         endMessage.textContent = 'Todos os temporizadores foram concluídos.';
         notificationPopup.appendChild(endMessage);
 
-        const okButton = document.createElement('button');
-        okButton.textContent = 'Ok';
-        notificationPopup.appendChild(okButton);
-
-        okButton.addEventListener('click', () => {
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Fechar';
+        closeButton.addEventListener('click', () => {
             document.body.removeChild(notificationPopup);
         });
-
-        document.body.appendChild(notificationPopup);
+        notificationPopup.appendChild(closeButton);
     }
+
+    document.body.appendChild(notificationPopup);
 }
 
 function startTimers(timers, currentIndex) {

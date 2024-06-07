@@ -1,4 +1,3 @@
-
 {
     "manifest_version": 3,
     "name": "Minha Extensão de Temporizador para Google Meet",
@@ -19,5 +18,12 @@
         "16": "icons/pequeno.png",
         "48": "icons/medio.png",
         "128": "icons/grande.png"
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://meet.google.com/*"],
+            "js": ["content.js"],
+            "css": ["content.css"]
+        }
+    ]
 }
