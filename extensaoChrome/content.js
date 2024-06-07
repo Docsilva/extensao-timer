@@ -1,7 +1,21 @@
+const crisisTypes = ["SITES P1", "SITES P2/P3"];
 
-const crisisTypes = ["Crise A", "Crise B", "Crise C", "Crise D"];
-//teste de comentario
-// Função para adicionar os estilos CSS ao documento
+const timersP1 = [
+    { duration: 5, message: "NATIS N2 / NATIS NOC" },
+    { duration: 10, message: "Net N2 y N3, NATS N2 / PLs (Net e NATIS) / IS Ops Analista" },
+    { duration: 30, message: "Network TLS / IS OPS Leaders" },
+    { duration: 40, message: "Managers Infra / Sustentación e NATIS Manager" }
+];
+
+const timersP2P3 = [
+    { duration: 5, message: "NATIS N2 / NATIS NOC" },
+    { duration: 10, message: "Net N1, NATS N2 / NATIS PLS / IS Ops Analistas" },
+    { duration: 25, message: "Network N2" },
+    { duration: 40, message: "Network N3 / Net PLs / IS OPS Leaders" },
+    { duration: 55, message: "NATIS Manager / Network TLs" },
+    { duration: 70, message: "Managers e Infra / Sustentación" }
+];
+
 function addStyles() {
     const style = document.createElement('link');
     style.rel = 'stylesheet';
@@ -9,13 +23,10 @@ function addStyles() {
     document.head.appendChild(style);
 }
 
-// Função para criar o popup de opções do temporizador
-function showTimerOptionsPopup() {
-    // Cria o popup
+function showTimerOptionsPopup(timers) {
     const popup = document.createElement('div');
     popup.id = 'timer-popup';
 
-    // Estilos do popup
     popup.style.position = 'fixed';
     popup.style.top = '10px';
     popup.style.right = '10px';
@@ -25,80 +36,37 @@ function showTimerOptionsPopup() {
     popup.style.zIndex = '1000';
     popup.style.width = '300px';
 
-    // Título do popup
     const title = document.createElement('h3');
-    title.textContent = 'Escolha o Tempo do Temporizador';
+    title.textContent = 'Lista de Temporizadores e Equipes';
     popup.appendChild(title);
 
-    // Caixa de seleção para escolher a duração do temporizador
-    const selectBox = document.createElement('select');
-    const options = ["5 segundos", "5 minutos", "10 minutos", "15 minutos"];
-    options.forEach(option => {
-        const optionElement = document.createElement('option');
-        optionElement.text = option;
-        selectBox.add(optionElement);
+    const list = document.createElement('ul');
+    timers.forEach((timer, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${timer.duration} segundos - ${timer.message}`;
+        list.appendChild(listItem);
     });
-    popup.appendChild(selectBox);
+    popup.appendChild(list);
 
-    // Botão para iniciar o temporizador
     const startButton = document.createElement('button');
     startButton.textContent = 'Iniciar';
     startButton.style.marginTop = '10px';
     popup.appendChild(startButton);
 
-    // Adiciona o popup ao corpo do documento
     document.body.appendChild(popup);
 
-    // Evento de clique no botão iniciar
     startButton.addEventListener('click', () => {
-        const selectedOption = selectBox.value;
-        let timerDuration;
-        let durationText;
-
-        switch (selectedOption) {
-            case "5 segundos":
-                timerDuration = 5000;
-                durationText = "5 segundos";
-                break;
-            case "5 minutos":
-                timerDuration = 5 * 60000;
-                durationText = "5 minutos";
-                break;
-            case "10 minutos":
-                timerDuration = 10 * 60000;
-                durationText = "10 minutos";
-                break;
-            case "15 minutos":
-                timerDuration = 15 * 60000;
-                durationText = "15 minutos";
-                break;
-            default:
-                timerDuration = 0;
-                durationText = "";
-                break;
-        }
-
-        if (timerDuration > 0) {
-            setTimeout(() => {
-                showTimerEndedNotification(durationText);
-            }, timerDuration);
-        }
-
-        // Remove o popup após a interação
         document.body.removeChild(popup);
+        startTimers(timers, 0);
     });
 }
 
-// Função para criar o popup inicial que pergunta se deseja usar o temporizador
 function createInitialPopup() {
-    // Adiciona os estilos ao documento
     addStyles();
 
-    // Cria o popup
     const popup = document.createElement('div');
     popup.id = 'initial-popup';
 
-    // Estilos do popup
     popup.style.position = 'fixed';
     popup.style.top = '10px';
     popup.style.right = '10px';
@@ -108,17 +76,14 @@ function createInitialPopup() {
     popup.style.zIndex = '1000';
     popup.style.width = '300px';
 
-    // Título do popup
     const title = document.createElement('h3');
     title.textContent = 'Iniciar Temporizador';
     popup.appendChild(title);
 
-    // Pergunta se o usuário deseja usar o temporizador
     const question = document.createElement('p');
     question.textContent = 'Essa reunião será usada para um incidente Critico?';
     popup.appendChild(question);
 
-    // Botões de resposta
     const yesButton = document.createElement('button');
     yesButton.textContent = 'Sim';
     yesButton.style.marginRight = '10px';
@@ -128,19 +93,15 @@ function createInitialPopup() {
     noButton.textContent = 'Não';
     popup.appendChild(noButton);
 
-    // Adiciona o popup ao corpo do documento
     document.body.appendChild(popup);
 
-    // Evento de clique no botão não
     noButton.addEventListener('click', () => {
         document.body.removeChild(popup);
     });
 
-    // Evento de clique no botão sim
     yesButton.addEventListener('click', () => {
         document.body.removeChild(popup);
 
-        // Criar e adicionar a selectbox de tipos de crise
         const crisisSelectBox = document.createElement('select');
         crisisTypes.forEach(crisis => {
             const optionElement = document.createElement('option');
@@ -148,11 +109,9 @@ function createInitialPopup() {
             crisisSelectBox.add(optionElement);
         });
 
-        // Criar um novo popup para a selectbox
         const crisisPopup = document.createElement('div');
         crisisPopup.id = 'crisis-popup';
 
-        // Estilos do popup
         crisisPopup.style.position = 'fixed';
         crisisPopup.style.top = '10px';
         crisisPopup.style.right = '10px';
@@ -162,38 +121,36 @@ function createInitialPopup() {
         crisisPopup.style.zIndex = '1000';
         crisisPopup.style.width = '300px';
 
-        // Título do popup
         const crisisTitle = document.createElement('h3');
         crisisTitle.textContent = 'Escolha o Tipo de Crise';
         crisisPopup.appendChild(crisisTitle);
 
-        // Adicionar a selectbox ao novo popup
         crisisPopup.appendChild(crisisSelectBox);
 
-        // Botão para confirmar o tipo de crise
         const confirmButton = document.createElement('button');
         confirmButton.textContent = 'Confirmar';
         confirmButton.style.marginTop = '10px';
         crisisPopup.appendChild(confirmButton);
 
-        // Adicionar o novo popup ao corpo do documento
         document.body.appendChild(crisisPopup);
 
-        // Evento de clique no botão confirmar
         confirmButton.addEventListener('click', () => {
+            const selectedCrisis = crisisSelectBox.value;
             document.body.removeChild(crisisPopup);
-            showTimerOptionsPopup();
+
+            if (selectedCrisis === 'SITES P1') {
+                showTimerOptionsPopup(timersP1);
+            } else if (selectedCrisis === 'SITES P2/P3') {
+                showTimerOptionsPopup(timersP2P3);
+            }
         });
     });
 }
 
-// Função para exibir uma notificação informando que o tempo do timer acabou
-function showTimerEndedNotification(durationText) {
-    // Cria o popup de notificação
+function showTimerEndedNotification(currentIndex, timers) {
     const notificationPopup = document.createElement('div');
     notificationPopup.id = 'notification-popup';
 
-    // Estilos do popup de notificação
     notificationPopup.style.position = 'fixed';
     notificationPopup.style.top = '10px';
     notificationPopup.style.right = '10px';
@@ -203,48 +160,75 @@ function showTimerEndedNotification(durationText) {
     notificationPopup.style.zIndex = '1001';
     notificationPopup.style.width = '300px';
 
-    // Conteúdo da notificação
     const notificationContent = document.createElement('p');
-    notificationContent.textContent = `O tempo do temporizador acabou! (${durationText})`;
+    notificationContent.textContent = `O tempo do temporizador ${currentIndex + 1} acabou! Acione a equipe: ${timers[currentIndex].message}.`;
     notificationPopup.appendChild(notificationContent);
 
-    // Pergunta ao usuário se deseja iniciar novamente
-    const question = document.createElement('p');
-    question.textContent = 'Deseja iniciar o temporizador novamente?';
-    notificationPopup.appendChild(question);
+    if (currentIndex < timers.length - 1) {
+        const remainingTimers = document.createElement('p');
+        remainingTimers.textContent = 'Temporizadores restantes:';
+        notificationPopup.appendChild(remainingTimers);
 
-    // Botões de resposta
-    const yesButton = document.createElement('button');
-    yesButton.textContent = 'Sim';
-    yesButton.style.marginRight = '10px';
-    notificationPopup.appendChild(yesButton);
+        const list = document.createElement('ul');
+        for (let i = currentIndex + 1; i < timers.length; i++) {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${timers[i].duration} segundos - ${timers[i].message}`;
+            list.appendChild(listItem);
+        }
+        notificationPopup.appendChild(list);
 
-    const noButton = document.createElement('button');
-    noButton.textContent = 'Não';
-    notificationPopup.appendChild(noButton);
+        const question = document.createElement('p');
+        question.textContent = 'Deseja iniciar o próximo temporizador?';
+        notificationPopup.appendChild(question);
 
-    // Adiciona o popup de notificação ao corpo do documento
-    document.body.appendChild(notificationPopup);
+        const yesButton = document.createElement('button');
+        yesButton.textContent = 'Sim';
+        yesButton.style.marginRight = '10px';
+        notificationPopup.appendChild(yesButton);
 
-    // Evento de clique no botão sim
-    yesButton.addEventListener('click', () => {
-        document.body.removeChild(notificationPopup);
-        showTimerOptionsPopup();
-    });
+        const noButton = document.createElement('button');
+        noButton.textContent = 'Não';
+        notificationPopup.appendChild(noButton);
 
-    // Evento de clique no botão não
-    noButton.addEventListener('click', () => {
-        document.body.removeChild(notificationPopup);
-    });
+        yesButton.addEventListener('click', () => {
+            document.body.removeChild(notificationPopup);
+            startTimers(timers, currentIndex + 1);
+        });
+
+        noButton.addEventListener('click', () => {
+            document.body.removeChild(notificationPopup);
+        });
+
+        document.body.appendChild(notificationPopup);
+    } else {
+        const endMessage = document.createElement('p');
+        endMessage.textContent = 'Todos os temporizadores foram concluídos.';
+        notificationPopup.appendChild(endMessage);
+
+        const okButton = document.createElement('button');
+        okButton.textContent = 'Ok';
+        notificationPopup.appendChild(okButton);
+
+        okButton.addEventListener('click', () => {
+            document.body.removeChild(notificationPopup);
+        });
+
+        document.body.appendChild(notificationPopup);
+    }
 }
 
-// Função para verificar se estamos em uma reunião
+function startTimers(timers, currentIndex) {
+    if (currentIndex < timers.length) {
+        setTimeout(() => {
+            showTimerEndedNotification(currentIndex, timers);
+        }, timers[currentIndex].duration * 1000);
+    }
+}
+
 function isMeetingActive() {
-    // Verifica a presença de elementos específicos de uma reunião
     return !!document.querySelector('[data-self-name]') || !!document.querySelector('[data-meeting-code]');
 }
 
-// Função para monitorar as ações do usuário
 function monitorUserActions() {
     document.addEventListener('click', (event) => {
         if (event.target.matches("span[jsname='V67aGc']") || event.target.matches("span[jsname='K4r5Ff']")) {
@@ -252,15 +236,13 @@ function monitorUserActions() {
                 if (isMeetingActive()) {
                     createInitialPopup();
                 }
-            }, 3000); // Aguarda 3 segundos para garantir que a reunião tenha sido iniciada
+            }, 3000);
         }
     });
 }
 
-// Solicita permissão para enviar notificações, caso ainda não tenha sido concedida
 if (Notification.permission !== "granted") {
     Notification.requestPermission();
 }
 
-// Inicializa a monitoração das ações do usuário
 monitorUserActions();
