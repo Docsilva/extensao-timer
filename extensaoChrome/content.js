@@ -1,3 +1,13 @@
+function importCSS(url) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = url;
+    document.head.appendChild(link);
+}
+
+importCSS('content.css');
+
 const crisisTypes = ["SITES P1", "SITES P2/P3"];
 const timersP1 = [
     { duration: 5, message: "NATIS N2 / NATIS NOC" },
@@ -17,14 +27,7 @@ const timersP2P3 = [
 function createInitialPopup() {
     const popup = document.createElement('div');
     popup.id = 'initial-popup';
-    popup.style.position = 'fixed';
-    popup.style.top = '50%';
-    popup.style.left = '50%';
-    popup.style.transform = 'translate(-50%, -50%)';
-    popup.style.padding = '20px';
-    popup.style.backgroundColor = '#fff';
-    popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    popup.style.zIndex = '1000';
+    popup.classList.add('popup');
 
     const question = document.createElement('p');
     question.textContent = 'Essa reunião será usada para um incidente Crítico?';
@@ -32,21 +35,23 @@ function createInitialPopup() {
 
     const yesButton = document.createElement('button');
     yesButton.textContent = 'Sim';
-    yesButton.style.marginRight = '10px';
+    yesButton.classList.add('button', 'button-yes');
     popup.appendChild(yesButton);
 
     const noButton = document.createElement('button');
     noButton.textContent = 'Não';
+    noButton.classList.add('button', 'button-no');
     popup.appendChild(noButton);
 
     document.body.appendChild(popup);
+    popup.style.display = 'block';
 
     noButton.addEventListener('click', () => {
-        document.body.removeChild(popup);
+        popup.style.display = 'none';
     });
 
     yesButton.addEventListener('click', () => {
-        document.body.removeChild(popup);
+        popup.style.display = 'none';
         createCrisisTypePopup();
     });
 }
@@ -54,14 +59,7 @@ function createInitialPopup() {
 function createCrisisTypePopup() {
     const popup = document.createElement('div');
     popup.id = 'crisis-popup';
-    popup.style.position = 'fixed';
-    popup.style.top = '50%';
-    popup.style.left = '50%';
-    popup.style.transform = 'translate(-50%, -50%)';
-    popup.style.padding = '20px';
-    popup.style.backgroundColor = '#fff';
-    popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    popup.style.zIndex = '1000';
+    popup.classList.add('popup');
 
     const question = document.createElement('p');
     question.textContent = 'Escolha o Tipo de Crise';
@@ -78,14 +76,15 @@ function createCrisisTypePopup() {
 
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Confirmar';
-    confirmButton.style.marginTop = '10px';
+    confirmButton.classList.add('button');
     popup.appendChild(confirmButton);
 
     document.body.appendChild(popup);
+    popup.style.display = 'block';
 
     confirmButton.addEventListener('click', () => {
         const selectedCrisis = select.value;
-        document.body.removeChild(popup);
+        popup.style.display = 'none';
         if (selectedCrisis === 'SITES P1') {
             showTimerOptionsPopup(timersP1);
         } else if (selectedCrisis === 'SITES P2/P3') {
@@ -97,14 +96,7 @@ function createCrisisTypePopup() {
 function showTimerOptionsPopup(timers) {
     const popup = document.createElement('div');
     popup.id = 'timer-popup';
-    popup.style.position = 'fixed';
-    popup.style.top = '55%';
-    popup.style.left = '50%';
-    popup.style.transform = 'translate(-50%, -50%)';
-    popup.style.padding = '20px';
-    popup.style.backgroundColor = '#fff';
-    popup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    popup.style.zIndex = '1000';
+    popup.classList.add('popup');
 
     const title = document.createElement('h3');
     title.textContent = 'Lista de Temporizadores e Equipes';
@@ -120,13 +112,14 @@ function showTimerOptionsPopup(timers) {
 
     const startButton = document.createElement('button');
     startButton.textContent = 'Iniciar';
-    startButton.style.marginTop = '10px';
+    startButton.classList.add('button');
     popup.appendChild(startButton);
 
     document.body.appendChild(popup);
+    popup.style.display = 'block';
 
     startButton.addEventListener('click', () => {
-        document.body.removeChild(popup);
+        popup.style.display = 'none';
         startTimers(timers, 0);
     });
 }
@@ -134,14 +127,7 @@ function showTimerOptionsPopup(timers) {
 function showTimerEndedNotification(currentIndex, timers) {
     const notificationPopup = document.createElement('div');
     notificationPopup.id = 'notification-popup';
-    notificationPopup.style.position = 'fixed';
-    notificationPopup.style.top = '50%';
-    notificationPopup.style.left = '50%';
-    notificationPopup.style.transform = 'translate(-50%, -50%)';
-    notificationPopup.style.padding = '20px';
-    notificationPopup.style.backgroundColor = '#fff';
-    notificationPopup.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    notificationPopup.style.zIndex = '1000';
+    notificationPopup.classList.add('popup');
 
     const notificationTitle = document.createElement('h3');
     notificationTitle.textContent = `${currentIndex + 1}º Temporizador Acabou`;
@@ -170,20 +156,21 @@ function showTimerEndedNotification(currentIndex, timers) {
 
         const yesButton = document.createElement('button');
         yesButton.textContent = 'Sim';
-        yesButton.style.marginRight = '10px';
+        yesButton.classList.add('button', 'button-yes');
         notificationPopup.appendChild(yesButton);
 
         const noButton = document.createElement('button');
         noButton.textContent = 'Não';
+        noButton.classList.add('button', 'button-no');
         notificationPopup.appendChild(noButton);
 
         yesButton.addEventListener('click', () => {
-            document.body.removeChild(notificationPopup);
+            notificationPopup.style.display = 'none';
             startTimers(timers, currentIndex + 1);
         });
 
         noButton.addEventListener('click', () => {
-            document.body.removeChild(notificationPopup);
+            notificationPopup.style.display = 'none';
         });
     } else {
         const endMessage = document.createElement('p');
@@ -192,13 +179,15 @@ function showTimerEndedNotification(currentIndex, timers) {
 
         const closeButton = document.createElement('button');
         closeButton.textContent = 'Fechar';
+        closeButton.classList.add('button');
         closeButton.addEventListener('click', () => {
-            document.body.removeChild(notificationPopup);
+            notificationPopup.style.display = 'none';
         });
         notificationPopup.appendChild(closeButton);
     }
 
     document.body.appendChild(notificationPopup);
+    notificationPopup.style.display = 'block';
 }
 
 function startTimers(timers, currentIndex) {

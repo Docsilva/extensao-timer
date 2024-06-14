@@ -3,19 +3,19 @@ body {
 }
 
 .button {
-    background-color: #ffd700; /* Cor de fundo amarelo */
-    color: #333; /* Cor do texto */
+    background-color: #ffd700; 
+    color: #333; 
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s ease;
-    margin-top: 10px; /* Adiciona margem superior */
+    margin-top: 10px; 
 }
 
 .button:hover {
-    background-color: #e6c200; /* Cor de fundo ao passar o mouse */
+    background-color: #e6c200; 
 }
 
 select {
@@ -23,27 +23,21 @@ select {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
-    margin-bottom: 10px; /* Adiciona margem inferior */
+    margin-bottom: 10px; 
 }
 
 .popup {
     display: none;
     position: fixed;
-    top: 10px; /* Distância do topo da tela */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(255, 255, 255, 0.9); /* Fundo branco com leve transparência */
+    top: 10px; 
+    right: 10px; 
+    background-color: rgba(255, 255, 255, 0.6); 
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     z-index: 9999;
-    text-align: center; /* Centralizar o texto */
-    background-image: url('chrome-extension://__MSG_@@extension_id__/icons/background.png'); /* Imagem de fundo em marca d'água */
-    background-size: cover; /* Cobrir todo o popup */
-    background-repeat: no-repeat; /* Não repetir a imagem */
-    background-position: center; /* Centralizar a imagem */
-    width: 400px; /* Largura padronizada */
-    height: 300px; /* Altura padronizada */
+    text-align: center; 
+    width: 400px; 
 }
 
 .popup p {
@@ -53,7 +47,7 @@ select {
 
 .popup ul {
     padding-left: 20px;
-    text-align: left; /* Alinhar a lista à esquerda */
+    text-align: left; 
 }
 
 .popup li {
@@ -62,5 +56,10 @@ select {
 
 .highlight {
     font-weight: bold;
-    color: #FF5733; /* Cor laranja para destacar */
+    color: #FF5733; 
+}
+
+.popup button {
+    display: inline-block;
+    margin-top: 10px;
 }
