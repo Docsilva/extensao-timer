@@ -24,6 +24,9 @@ const timersP2P3 = [
     { duration: 70, message: "Managers e Infra / Sustentación" }
 ];
 
+let currentIndex = 0; // Variável global para armazenar o índice atual do temporizador
+let selectedTimers = null; // Variável global para armazenar os temporizadores selecionados
+
 function createInitialPopup() {
     const popup = document.createElement('div');
     popup.id = 'initial-popup';
@@ -86,14 +89,17 @@ function createCrisisTypePopup() {
         const selectedCrisis = select.value;
         popup.style.display = 'none';
         if (selectedCrisis === 'SITES P1') {
-            showTimerOptionsPopup(timersP1);
+            selectedTimers = timersP1;
         } else if (selectedCrisis === 'SITES P2/P3') {
-            showTimerOptionsPopup(timersP2P3);
+            selectedTimers = timersP2P3;
         }
+        showTimerOptionsPopup(selectedTimers);
     });
 }
 
 function showTimerOptionsPopup(timers) {
+    currentIndex = 0; // Reinicia o índice atual ao exibir a tela de temporizadores
+
     const popup = document.createElement('div');
     popup.id = 'timer-popup';
     popup.classList.add('popup');
@@ -120,7 +126,7 @@ function showTimerOptionsPopup(timers) {
 
     startButton.addEventListener('click', () => {
         popup.style.display = 'none';
-        startTimers(timers, 0);
+        startTimers(timers, currentIndex);
     });
 }
 
@@ -166,7 +172,8 @@ function showTimerEndedNotification(currentIndex, timers) {
 
         yesButton.addEventListener('click', () => {
             notificationPopup.style.display = 'none';
-            startTimers(timers, currentIndex + 1);
+            currentIndex++; // Atualiza o índice atual do temporizador globalmente
+            startTimers(timers, currentIndex);
         });
 
         noButton.addEventListener('click', () => {
@@ -190,11 +197,11 @@ function showTimerEndedNotification(currentIndex, timers) {
     notificationPopup.style.display = 'block';
 }
 
-function startTimers(timers, currentIndex) {
-    if (currentIndex < timers.length) {
+function startTimers(timers, index) {
+    if (index < timers.length) {
         setTimeout(() => {
-            showTimerEndedNotification(currentIndex, timers);
-        }, timers[currentIndex].duration * 1000);
+            showTimerEndedNotification(index, timers);
+        }, timers[index].duration * 1000);
     }
 }
 
@@ -202,20 +209,33 @@ function isMeetingActive() {
     return !!document.querySelector('[data-self-name]') || !!document.querySelector('[data-meeting-code]');
 }
 
-function monitorUserActions() {
-    document.addEventListener('click', (event) => {
-        if (event.target.matches("span[jsname='V67aGc']") || event.target.matches("span[jsname='K4r5Ff']")) {
-            setTimeout(() => {
-                if (isMeetingActive()) {
-                    createInitialPopup();
-                }
-            }, 3000);
-        }
+function monitorJoinNowButton() {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) {
+                        const joinButton = node.querySelector("button[jsname='Qx7uuf']");
+                        if (joinButton) {
+                            joinButton.addEventListener('click', () => {
+                                setTimeout(() => {
+                                    if (isMeetingActive()) {
+                                        createInitialPopup();
+                                    }
+                                }, 3000); // Pequeno atraso para garantir que a reunião tenha iniciado
+                            });
+                        }
+                    }
+                });
+            }
+        });
     });
+
+    observer.observe(document.body, { childList: true, subtree: true });
 }
 
 if (Notification.permission !== "granted") {
     Notification.requestPermission();
 }
 
-monitorUserActions();
+monitorJoinNowButton();
