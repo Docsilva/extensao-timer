@@ -26,6 +26,7 @@ const timersP2P3 = [
 
 let currentIndex = 0; // Variável global para armazenar o índice atual do temporizador
 let selectedTimers = null; // Variável global para armazenar os temporizadores selecionados
+let timerInterval = null; // Variável para armazenar o intervalo do temporizador
 
 function createInitialPopup() {
     const popup = document.createElement('div');
@@ -199,10 +200,32 @@ function showTimerEndedNotification(currentIndex, timers) {
 
 function startTimers(timers, index) {
     if (index < timers.length) {
-        setTimeout(() => {
-            showTimerEndedNotification(index, timers);
-        }, timers[index].duration * 1000);
+        const timerDisplay = createOrUpdateTimerDisplay(timers[index].duration);
+        let remainingTime = timers[index].duration;
+
+        timerInterval = setInterval(() => {
+            remainingTime--;
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                timerDisplay.remove();
+                showTimerEndedNotification(index, timers);
+            } else {
+                timerDisplay.textContent = `Tempo restante: ${remainingTime} segundos`;
+            }
+        }, 1000);
     }
+}
+
+function createOrUpdateTimerDisplay(duration) {
+    let timerDisplay = document.getElementById('timer-display');
+    if (!timerDisplay) {
+        timerDisplay = document.createElement('div');
+        timerDisplay.id = 'timer-display';
+        timerDisplay.classList.add('timer-display');
+        document.body.appendChild(timerDisplay);
+    }
+    timerDisplay.textContent = `Tempo restante: ${duration} segundos`;
+    return timerDisplay;
 }
 
 function isMeetingActive() {
